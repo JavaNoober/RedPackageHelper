@@ -110,6 +110,8 @@ public class MainActivity extends BaseSettingsActivity {
         } else {
             showOpenAccessibilityServiceDialog();
         }
+        Config.getConfig(getApplicationContext()).setAgreement(true);
+        QHBApplication.eventStatistics(MainActivity.this, "agreement", "true");
 //免责声明
 //        boolean isAgreement = Config.getConfig(this).isAgreement();
 //        if(!isAgreement) {
@@ -240,7 +242,7 @@ public class MainActivity extends BaseSettingsActivity {
             public boolean onLongClick(View v) {
                 File output = new File(android.os.Environment.getExternalStorageDirectory(), "myfilename.jpg");
                 if(!output.exists()) {
-                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wechatpay_qr);
+                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), 0);
                     BitmapUtils.saveBitmap(MainActivity.this, output, bitmap);
                 }
                 Toast.makeText(MainActivity.this, "已保存到:" + output.getAbsolutePath(), Toast.LENGTH_LONG).show();
