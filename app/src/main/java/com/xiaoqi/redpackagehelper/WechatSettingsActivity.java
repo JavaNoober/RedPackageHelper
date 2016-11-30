@@ -7,11 +7,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 
 /**
- * <p>Created 16/2/5 下午12:57.</p>
- * <p><a href="mailto:codeboy2013@gmail.com">Email:codeboy2013@gmail.com</a></p>
- * <p><a href="http://www.happycodeboy.com">LeonLee Blog</a></p>
- *
- * @author LeonLee
  */
 public class WechatSettingsActivity extends BaseSettingsActivity {
 

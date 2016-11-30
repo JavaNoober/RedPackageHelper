@@ -20,8 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <p>Created by LeonLee on 15/2/17 下午10:25.</p>
- * <p><a href="mailto:codeboy2013@163.com">Email:codeboy2013@163.com</a></p>
  *
  * 抢红包外挂服务
  */

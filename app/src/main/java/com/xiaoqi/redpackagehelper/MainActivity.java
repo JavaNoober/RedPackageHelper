@@ -32,9 +32,6 @@ import com.xiaoqi.redpackagehelper.util.BitmapUtils;
 import java.io.File;
 
 /**
- * <p>Created by LeonLee on 15/2/17 下午10:11.</p>
- * <p><a href="mailto:codeboy2013@163.com">Email:codeboy2013@163.com</a></p>
- *
  * 抢红包主界面
  */
 public class MainActivity extends BaseSettingsActivity {
@@ -113,11 +110,11 @@ public class MainActivity extends BaseSettingsActivity {
         } else {
             showOpenAccessibilityServiceDialog();
         }
-
-        boolean isAgreement = Config.getConfig(this).isAgreement();
-        if(!isAgreement) {
-            showAgreementDialog();
-        }
+//免责声明
+//        boolean isAgreement = Config.getConfig(this).isAgreement();
+//        if(!isAgreement) {
+//            showAgreementDialog();
+//        }
     }
 
     @Override
@@ -241,7 +238,7 @@ public class MainActivity extends BaseSettingsActivity {
 
             @Override
             public boolean onLongClick(View v) {
-                File output = new File(android.os.Environment.getExternalStorageDirectory(), "codeboy_wechatpay_qr.jpg");
+                File output = new File(android.os.Environment.getExternalStorageDirectory(), "myfilename.jpg");
                 if(!output.exists()) {
                     Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wechatpay_qr);
                     BitmapUtils.saveBitmap(MainActivity.this, output, bitmap);
@@ -353,14 +350,14 @@ public class MainActivity extends BaseSettingsActivity {
 
             Preference preference = findPreference("KEY_FOLLOW_ME");
             if(preference != null) {
-                preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        ((MainActivity) getActivity()).showQrDialog();
-                        QHBApplication.eventStatistics(getActivity(), "about_author");
-                        return true;
-                    }
-                });
+//                preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//                    @Override
+//                    public boolean onPreferenceClick(Preference preference) {
+//                        ((MainActivity) getActivity()).showQrDialog();
+//                        QHBApplication.eventStatistics(getActivity(), "about_author");
+//                        return true;
+//                    }
+//                });
             }
 
             preference = findPreference("KEY_DONATE_ME");

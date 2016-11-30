@@ -8,13 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Switch;
 
-/**
- * <p>Created 16/2/7 下午7:38.</p>
- * <p><a href="mailto:730395591@qq.com">Email:730395591@qq.com</a></p>
- * <p><a href="http://www.happycodeboy.com">LeonLee Blog</a></p>
- *
- * @author LeonLee
- */
 public class CustomSwitchPreference extends SwitchPreference {
 
     /**

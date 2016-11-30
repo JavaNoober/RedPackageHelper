@@ -6,10 +6,6 @@ import android.preference.Preference;
 
 /**
  * <p>Created 16/2/5 下午9:25.</p>
- * <p><a href="mailto:codeboy2013@gmail.com">Email:codeboy2013@gmail.com</a></p>
- * <p><a href="http://www.happycodeboy.com">LeonLee Blog</a></p>
- *
- * @author LeonLee
  */
 public class NotifySettingsActivity extends BaseSettingsActivity {
     @Override

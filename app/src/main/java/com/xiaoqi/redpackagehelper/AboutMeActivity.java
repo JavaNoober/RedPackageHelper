@@ -10,11 +10,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 /**
- * <p>Created 16/2/6 下午2:05.</p>
- * <p><a href="mailto:730395591@qq.com">Email:730395591@qq.com</a></p>
- * <p><a href="http://www.happycodeboy.com">LeonLee Blog</a></p>
  *
- * @author LeonLee
  */
 public class AboutMeActivity extends BaseActivity {
 

@@ -11,13 +11,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-/**
- * <p>Created 16/2/7 上午1:37.</p>
- * <p><a href="mailto:730395591@qq.com">Email:730395591@qq.com</a></p>
- * <p><a href="http://www.happycodeboy.com">LeonLee Blog</a></p>
- *
- * @author LeonLee
- */
 public final class BitmapUtils {
 
     private BitmapUtils() {}
