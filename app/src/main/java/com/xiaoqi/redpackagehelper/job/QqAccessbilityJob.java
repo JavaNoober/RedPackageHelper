@@ -37,11 +37,6 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
     /** 红包消息的关键字*/
     private static final String HONGBAO_TEXT_KEY = "[QQ红包]";
 
-    private static final String BUTTON_CLASS_NAME = "android.widget.Button";
-
-
-    /** 不能再使用文字匹配的最小版本号 */
-    private static final int USE_ID_MIN_VERSION = 700;// 6.3.8 对应code为680,6.3.9对应code为700
 
     private static final int WINDOW_NONE = 0;
     private static final int WINDOW_LUCKYMONEY_DETAIL = 2;
@@ -58,34 +53,15 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
     private Handler mHandler = null;
     private boolean hasGetMoney = false;
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //更新安装包信息
-            updatePackageInfo();
-        }
-    };
-
     @Override
     public void onCreateJob(QiangHongBaoService service) {
         super.onCreateJob(service);
 
-        updatePackageInfo();
-
-        IntentFilter filter = new IntentFilter();
-        filter.addDataScheme("package");
-        filter.addAction("android.intent.action.PACKAGE_ADDED");
-        filter.addAction("android.intent.action.PACKAGE_REPLACED");
-        filter.addAction("android.intent.action.PACKAGE_REMOVED");
-
-        getContext().registerReceiver(broadcastReceiver, filter);
     }
 
     @Override
     public void onStopJob() {
-        try {
-            getContext().unregisterReceiver(broadcastReceiver);
-        } catch (Exception e) {}
+
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -135,58 +111,6 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
         }
     }
 
-    /** 是否为群聊天*/
-    private boolean isMemberChatUi(AccessibilityNodeInfo nodeInfo) {
-        if(nodeInfo == null) {
-            return false;
-        }
-        String id = "com.tencent.mm:id/ces";
-        int wv = getWechatVersion();
-        if(wv <= 680) {
-            id = "com.tencent.mm:id/ew";
-        } else if(wv <= 700) {
-            id = "com.tencent.mm:id/cbo";
-        }
-        String title = null;
-        AccessibilityNodeInfo target = AccessibilityHelper.findNodeInfosById(nodeInfo, id);
-        if(target != null) {
-            title = String.valueOf(target.getText());
-        }
-        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("返回");
-
-        if(list != null && !list.isEmpty()) {
-            AccessibilityNodeInfo parent = null;
-            for(AccessibilityNodeInfo node : list) {
-                if(!"android.widget.ImageView".equals(node.getClassName())) {
-                    continue;
-                }
-                String desc = String.valueOf(node.getContentDescription());
-                if(!"返回".equals(desc)) {
-                    continue;
-                }
-                parent = node.getParent();
-                break;
-            }
-            if(parent != null) {
-                parent = parent.getParent();
-            }
-            if(parent != null) {
-                if( parent.getChildCount() >= 2) {
-                    AccessibilityNodeInfo node = parent.getChild(1);
-                    if("android.widget.TextView".equals(node.getClassName())) {
-                        title = String.valueOf(node.getText());
-                    }
-                }
-            }
-        }
-
-
-        if(title != null && title.endsWith(")")) {
-            return true;
-        }
-        return false;
-    }
-
     /** 通知栏事件*/
     private void notificationEvent(String ticker, Notification nf) {
         String text = ticker;
@@ -221,12 +145,12 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void openHongBao(AccessibilityEvent event) {
-        if("cooperation.qwallet.plugin.QWalletPluginProxyActivity".equals(event.getClassName())) {
+        if(hasGetMoney){
+            hasGetMoney = false;
+            AccessibilityHelper.performHome(getService());
+        } else if("cooperation.qwallet.plugin.QWalletPluginProxyActivity".equals(event.getClassName())) {
             mCurrentWindow = WINDOW_LUCKYMONEY_DETAIL;
-            if(hasGetMoney){
-                hasGetMoney = false;
-                AccessibilityHelper.performHome(getService());
-            }else {
+            if(!hasGetMoney) {
                 hasGetMoney = true;
                 AccessibilityHelper.performBack(getService());
             }
@@ -239,82 +163,6 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
         }
     }
 
-    /**
-     * 点击聊天里的红包后，显示的界面
-     * */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void handleLuckyMoneyReceive() {
-        AccessibilityNodeInfo nodeInfo = getService().getRootInActiveWindow();
-        if(nodeInfo == null) {
-            Log.w(TAG, "rootWindow为空");
-            return;
-        }
-
-        AccessibilityNodeInfo targetNode = null;
-
-        int event = getConfig().getWechatAfterOpenHongBaoEvent();
-        int wechatVersion = getWechatVersion();
-        if(event == Config.WX_AFTER_OPEN_HONGBAO) { //拆红包
-            if (wechatVersion < USE_ID_MIN_VERSION) {
-                targetNode = AccessibilityHelper.findNodeInfosByText(nodeInfo, "拆红包");
-            } else {
-                String buttonId = "com.tencent.mm:id/b43";
-
-                if(wechatVersion == 700) {
-                    buttonId = "com.tencent.mm:id/b2c";
-                }
-
-                if(buttonId != null) {
-                    targetNode = AccessibilityHelper.findNodeInfosById(nodeInfo, buttonId);
-                }
-
-                if(targetNode == null) {
-                    //分别对应固定金额的红包 拼手气红包
-                    AccessibilityNodeInfo textNode = AccessibilityHelper.findNodeInfosByTexts(nodeInfo, "发了一个红包", "给你发了一个红包", "发了一个红包，金额随机");
-
-                    if(textNode != null) {
-                        for (int i = 0; i < textNode.getChildCount(); i++) {
-                            AccessibilityNodeInfo node = textNode.getChild(i);
-                            if (BUTTON_CLASS_NAME.equals(node.getClassName())) {
-                                targetNode = node;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if(targetNode == null) { //通过组件查找
-                    targetNode = AccessibilityHelper.findNodeInfosByClassName(nodeInfo, BUTTON_CLASS_NAME);
-                }
-            }
-        } else if(event == Config.WX_AFTER_OPEN_SEE) { //看一看
-            if(getWechatVersion() < USE_ID_MIN_VERSION) { //低版本才有 看大家手气的功能
-                targetNode = AccessibilityHelper.findNodeInfosByText(nodeInfo, "看看大家的手气");
-            }
-        } else if(event == Config.WX_AFTER_OPEN_NONE) {
-            return;
-        }
-
-        if(targetNode != null) {
-            final AccessibilityNodeInfo n = targetNode;
-            long sDelayTime = getConfig().getWechatOpenDelayTime();
-            if(sDelayTime != 0) {
-                getHandler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        AccessibilityHelper.performClick(n);
-                    }
-                }, sDelayTime);
-            } else {
-                AccessibilityHelper.performClick(n);
-            }
-            if(event == Config.WX_AFTER_OPEN_HONGBAO) {
-                QHBApplication.eventStatistics(getContext(), "open_hongbao");
-            } else {
-                QHBApplication.eventStatistics(getContext(), "open_see");
-            }
-        }
-    }
 
     /**
      * 收到聊天里的红包
@@ -382,20 +230,5 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
         return mHandler;
     }
 
-    /** 获取微信的版本*/
-    private int getWechatVersion() {
-        if(mWechatPackageInfo == null) {
-            return 0;
-        }
-        return mWechatPackageInfo.versionCode;
-    }
 
-    /** 更新微信包信息*/
-    private void updatePackageInfo() {
-        try {
-            mWechatPackageInfo = getContext().getPackageManager().getPackageInfo(QQ_PACKAGENAME, 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 }
