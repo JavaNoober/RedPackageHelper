@@ -44,7 +44,6 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
     private static final int USE_ID_MIN_VERSION = 700;// 6.3.8 对应code为680,6.3.9对应code为700
 
     private static final int WINDOW_NONE = 0;
-    private static final int WINDOW_LUCKYMONEY_RECEIVEUI = 1;
     private static final int WINDOW_LUCKYMONEY_DETAIL = 2;
     private static final int WINDOW_LAUNCHER = 3;
     private static final int WINDOW_OTHER = -1;
@@ -52,6 +51,9 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
     private int mCurrentWindow = WINDOW_NONE;
 
     private boolean isReceivingHongbao;
+    private boolean needInput;
+    private boolean needSend;
+
     private PackageInfo mWechatPackageInfo = null;
     private Handler mHandler = null;
     private boolean hasGetMoney = false;
@@ -319,10 +321,6 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
      * */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void handleChatListHongBao() {
-        int mode = getConfig().getWechatMode();
-        if(mode == Config.WX_MODE_3) { //只通知模式
-            return;
-        }
 
         AccessibilityNodeInfo nodeInfo = getService().getRootInActiveWindow();
         if(nodeInfo == null) {
@@ -330,27 +328,41 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
             return;
         }
 
-        if(mode != Config.WX_MODE_0) {
-            boolean isMember = isMemberChatUi(nodeInfo);
-            if(mode == Config.WX_MODE_1 && isMember) {//过滤群聊
-                return;
-            } else if(mode == Config.WX_MODE_2 && !isMember) { //过滤单聊
-                return;
-            }
-        }
-
         List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("点击拆开");
 
         if(list != null && list.isEmpty()) {
             // 从消息列表查找红包
-            AccessibilityNodeInfo node = AccessibilityHelper.findNodeInfosByText(nodeInfo, "[QQ红包]");
+            AccessibilityNodeInfo node = AccessibilityHelper.findNodeInfosByText(nodeInfo, HONGBAO_TEXT_KEY);
             if(node != null) {
                 if(BuildConfig.DEBUG) {
                     Log.i(TAG, "-->QQ红包:" + node);
                 }
                 isReceivingHongbao = true;
                 AccessibilityHelper.performClick(nodeInfo);
-            }
+            }else{
+                AccessibilityNodeInfo messageNode = AccessibilityHelper.findNodeInfosByText(nodeInfo, "口令红包");
+                if(needInput){
+                    AccessibilityNodeInfo clickNode = AccessibilityHelper.findNodeInfosByText(nodeInfo, "点击输入口令");
+                    if(clickNode != null){
+                        AccessibilityHelper.performClick(clickNode);
+                        needSend = true;
+                    }else if(needSend){
+                        needInput = false;
+                        needSend = false;
+                        AccessibilityNodeInfo sendNode = AccessibilityHelper.findNodeInfosByText(nodeInfo, "发送");
+                        if(sendNode != null){
+                            AccessibilityHelper.performClick(sendNode);
+                            isReceivingHongbao = false;
+                        }
+                    }
+                } else if(messageNode != null) {
+                        if(BuildConfig.DEBUG) {
+                            Log.i(TAG, "-->QQ红包:" + node);
+                        }
+                        needInput = true;
+                        AccessibilityHelper.performClick(messageNode);
+                    }
+                }
         } else if(list != null) {
             if (isReceivingHongbao){
                 //最新的红包领起
@@ -359,6 +371,8 @@ public class QqAccessbilityJob extends BaseAccessbilityJob {
                 isReceivingHongbao = false;
             }
         }
+
+
     }
 
     private Handler getHandler() {
