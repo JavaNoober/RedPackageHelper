@@ -12,6 +12,7 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
 import com.xiaoqi.redpackagehelper.job.AccessbilityJob;
+import com.xiaoqi.redpackagehelper.job.QqAccessbilityJob;
 import com.xiaoqi.redpackagehelper.job.WechatAccessbilityJob;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class QiangHongBaoService extends AccessibilityService {
     private static final String TAG = "QiangHongBao";
 
     private static final Class[] ACCESSBILITY_JOBS= {
-            WechatAccessbilityJob.class,
+            WechatAccessbilityJob.class, QqAccessbilityJob.class
     };
 
     private static QiangHongBaoService service;

@@ -3,11 +3,10 @@
 
     <PreferenceCategory
             android:title="开启抢红包平台">
-
+        <!--android:icon="@drawable/settings_ic_wechat"-->
         <com.xiaoqi.redpackagehelper.widget.CustomSwitchPreference
             android:defaultValue="true"
-            android:title="微信"
-            android:icon="@drawable/settings_ic_wechat"
+            android:title="同时开启 微信、QQ 抢红包功能"
             android:key="KEY_ENABLE_WECHAT"/>
 
     </PreferenceCategory>
@@ -19,17 +18,17 @@
             android:summary="@string/follow_preference_summary"
             android:key="KEY_FOLLOW_ME"/>
 
-        <!--<Preference-->
-            <!--android:title="@string/donate_title"-->
-            <!--android:summary="@string/donate_summary"-->
-            <!--android:key="KEY_DONATE_ME"/>-->
+        <Preference
+            android:title="@string/donate_title"
+            android:summary="@string/donate_summary"
+            android:key="KEY_DONATE_ME"/>
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="平台设置">
 
         <Preference
-            android:title="微信设置"
+            android:title="设置"
             android:summary="更改抢红包模式，可以防封号"
             android:key="WECHAT_SETTINGS"/>
 
