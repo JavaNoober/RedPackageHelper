@@ -104,6 +104,8 @@ public class QiangHongBaoService extends AccessibilityService {
             Log.d(TAG, "事件--->" + event );
         }
         String pkn = String.valueOf(event.getPackageName());
+        Log.d(TAG, "packageName--->" + event.getClassName() );
+
         if(mAccessbilityJobs != null && !mAccessbilityJobs.isEmpty()) {
             if(!getConfig().isAgreement()) {
                 return;
